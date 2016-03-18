@@ -68,9 +68,6 @@ incorso = None
 # Playlist di /rage, si riempie quando è vuota
 rage = []
 
-# TODO: Rimettere gli audio di Wololo
-# wololo = []
-
 audiolist = {
     'madinuovo': 'BQADAgADMwIAAh8GgAFQaq1JNk1ZtwI',
     'sallati': 'BQADAgADrAIAAh8GgAHTdcu8cG-LbAI',
