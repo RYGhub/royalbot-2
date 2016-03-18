@@ -8,7 +8,6 @@ import random
 import osu
 import hearthstone
 import lol
-import string
 
 
 # Check per la modalità votazione del bot, corrisponde al numero della chat in cui è attiva la votazione
@@ -67,9 +66,6 @@ incorso = None
 
 # Playlist di /rage, si riempie quando è vuota
 rage = []
-
-# TODO: Rimettere gli audio di Wololo
-# wololo = []
 
 audiolist = {
     'madinuovo': 'BQADAgADMwIAAh8GgAFQaq1JNk1ZtwI',
@@ -515,39 +511,34 @@ while True:
                             sentin, source)
                 elif text.startswith('/si'):
                     print("@" + username + ": /si ")
-                    if incorso is not None:
-                        if incorso.chat == sentin:
+                    if incorso is not None and incorso.chat == sentin:
                             incorso.register(username.lower(), 1)
                             telegram.sendmessage("Votazione registrata!", sentin, source)
                     else:
                         telegram.sendmessage(chr(9888) + " Non è in corso nessuna votazione!", sentin, source)
                 elif text.startswith('/no'):
                     print("@" + username + ": /no ")
-                    if incorso is not None:
-                        if incorso.chat == sentin:
+                    if incorso is not None and incorso.chat == sentin:
                             incorso.register(username.lower(), 2)
                             telegram.sendmessage("Votazione registrata!", sentin, source)
                     else:
                         telegram.sendmessage(chr(9888) + " Non è in corso nessuna votazione!", sentin, source)
                 elif text.startswith('/astieniti'):
                     print("@" + username + ": /astieniti ")
-                    if incorso is not None:
-                        if incorso.chat == sentin:
+                    if incorso is not None and incorso.chat == sentin:
                             incorso.register(username.lower(), 3)
                             telegram.sendmessage("Votazione registrata!", sentin, source)
                     else:
                         telegram.sendmessage(chr(9888) + " Non è in corso nessuna votazione!", sentin, source)
                 elif text.startswith('/domanda'):
                     print("@" + username + ": /domanda ")
-                    if incorso is not None:
-                        if incorso.chat == sentin:
+                    if incorso is not None and incorso.chat == sentin:
                             incorso.ask()
                     else:
                         telegram.sendmessage(chr(9888) + " Non è in corso nessuna votazione!", sentin, source)
                 elif text.startswith('/risultati'):
                     print("@" + username + ": /risultati ")
-                    if incorso is not None:
-                        if incorso.chat == sentin:
+                    if incorso is not None and incorso.chat == sentin:
                             incorso.showresults()
                     else:
                         telegram.sendmessage(chr(9888) + " Non è in corso nessuna votazione!", sentin, source)
@@ -626,21 +617,35 @@ while True:
                     print("@" + username + ": /lolhistory")
                     # Informa Telegram che il messaggio è stato ricevuto.
                     telegram.sendchataction(sentin)
-                    sendme = "*Ultime 5 ranked giocate:*\n"
+                    sendme = "*Ultime 5 partite pubbliche giocate:*\n"
                     cmd = text.split(" ", 1)
-                    if "lol" in royalgames[username.lower()]:
-                        r = lol.getmatchlist(royalgames[username.lower()]['lol'])
-                        if len(r['matches']) > 0:
-                            for match in r['matches'][:5]:
-                                sd = lol.getchampionstaticdata(match['champion'])
-                                sendme += "`{0}` {1} ({2})\n".format(str(match['matchId']),
-                                                                     sd['name'],
-                                                                     match['lane'])
-                            telegram.sendmessage(sendme, sentin, source)
-                        else:
-                            telegram.sendmessage(chr(9888) + " Non hai mai giocato ranked.", sentin, source)
+                    if len(cmd) > 1:
+                        telegram.sendmessage("Non ancora supportato.")
                     else:
-                        telegram.sendmessage(chr(9888) + " Non hai un account di LoL nel database.", sentin, source)
+                        if "lol" in royalgames[username.lower()]:
+                            r = lol.getmatchlist(royalgames[username.lower()]['lol'])
+                            if 'matches' in r:
+                                if len(r['matches']) > 0:
+                                    for match in r['matches'][:5]:
+                                        sd = lol.getchampionstaticdata(match['champion'])
+                                        sendme += "`{0}` {1} ({2})\n".format(str(match['matchId']),
+                                                                             sd['name'],
+                                                                             match['lane'])
+                                    telegram.sendmessage(sendme, sentin, source)
+                                else:
+                                    telegram.sendmessage(chr(9888) + " Nessuna partita trovata.\n"
+                                                                     "Le partite unranked di solito sono "
+                                                                     "nascoste, devi aver giocato in ranked "
+                                                                     "perchè venga visualizzato qualcosa.",
+                                                         sentin, source)
+                            else:
+                                telegram.sendmessage(chr(9888) + " Nessuna partita trovata.\n"
+                                                                 "Le partite unranked di solito sono "
+                                                                 "nascoste, devi aver giocato in ranked "
+                                                                 "perchè venga visualizzato qualcosa.", sentin, source)
+                        else:
+                            telegram.sendmessage(chr(9888) + " Non hai un account di LoL nel database. Scrivi a @Steffo"
+                                                             " magari?", sentin, source)
                 elif text.startswith('/crash'):
                     # Crasha il bot. Mi sembra geniale.
                     if username == 'Steffo':
